@@ -1,0 +1,60 @@
+FADE = Fade to black after [3] seconds
+
+Intro - 3 levels - DOGGO - 3 levels - CROWS - 3 levels - END
+
+Intro
+"Grim? I'm sorry. I need you again"
+- Basic Control info
+- FADE
+
+Title Screen
+- Start -> Level0
+- Controls -> Intro
+
+Level0
+"The sheep. It's time has come"
+- Open Field
+- Kill the Sheep
+- FADE
+
+Level1
+"Flocks"
+- Field with Obstacles
+- Kill Multiple Sheep
+- FADE
+
+Level2
+"Well looky here looky here ah what do we have?"
+- Kill the Farmer
+- FADE
+
+DOGGO
+- Open Field
+- Dog Chases you around
+- FADE
+
+Level3
+
+Level4
+
+Level5
+"You ever see that movie, STAR WARS"
+
+CROWS
+
+Level6
+
+Level7
+
+Level8
+
+END 
+-Open Field
+- Dog goes to center
+- OPTION
+	- Kill the Dog 
+	- FADE -> Level 14 ?
+- OPTION
+	- Do Nothing (20)
+	- Narrator Gets Mad
+	- FADE -> Title

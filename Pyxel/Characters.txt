@@ -1,0 +1,26 @@
+GRIM (player)
+
+DOG (companion)
+- follows GRIM
+
+SHEEP (easy attack)
+- flees DOG
+
+WOLF (easy defence)
+- chases DOG
+- 'hurts' DOG
+
+HUMAN (medium attack)
+- flees GRIM
+
+CHICKEN (hard attack)
+- flees GRIM
+- flees DOG
+- avoids ALL
+
+CROW (hard defence)
+- chases GRIM
+- 'hurts' DOG
+
+
+
