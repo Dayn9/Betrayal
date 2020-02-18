@@ -284,7 +284,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_AssetsPPU: 16
   m_RefResolutionX: 320
-  m_RefResolutionY: 180
+  m_RefResolutionY: 200
   m_UpscaleRT: 0
   m_PixelSnapping: 0
   m_CropFrameX: 0
@@ -457,7 +457,7 @@ GameObject:
   - component: {fileID: 988019760}
   - component: {fileID: 988019759}
   m_Layer: 0
-  m_Name: title
+  m_Name: Title
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
