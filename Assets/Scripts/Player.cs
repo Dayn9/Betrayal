@@ -15,8 +15,8 @@ public class Player : Character
         get { return state; }
         set {
             state = value;
-
             StopAllCoroutines();
+
             switch (state)
             {
                 case PlayerState.MOVE:
@@ -27,7 +27,6 @@ public class Player : Character
                     animator.SetTrigger("Swipe"); //start the swipe animation
                     break;
             }
-
         }
     }
 
@@ -36,12 +35,18 @@ public class Player : Character
         State = PlayerState.MOVE;
     }
 
+    /// <summary>
+    /// Moving behavior 
+    /// Converts Keyboard input into player movement
+    /// </summary>
+    /// <returns></returns>
     private IEnumerator Moving()
     {
         while(State == PlayerState.MOVE)
         {
-            Vector2 input = new Vector2(Input.GetAxis("Horizontal"),
-                                    Input.GetAxis("Vertical"));
+            Vector2 input = new Vector2(
+                x : Input.GetAxis("Horizontal"), 
+                y: Input.GetAxis("Vertical"));
 
             movement.Input = input;
 
@@ -54,13 +59,14 @@ public class Player : Character
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.CompareTag("Target"))
+        if (state != PlayerState.SWIPE && collision.gameObject.CompareTag("Target"))
         {
             State = PlayerState.SWIPE;
 
             Character character = collision.gameObject.GetComponent<Character>();
             if (character != null)
             {
+                //Run the Attack behavior on the target character
                 character.Attacked?.Invoke();
             }
         }

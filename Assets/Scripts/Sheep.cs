@@ -112,8 +112,11 @@ public class Sheep : Character
 
     private IEnumerator Kill()
     {
-        renderer.enabled = false;
         ParticleSystem particleSystem = GetComponent<ParticleSystem>();
+        Collider2D collider = GetComponent<Collider2D>();
+
+        renderer.enabled = false;
+        collider.enabled = false;
 
         yield return new WaitForSeconds(particleSystem.main.duration);
 

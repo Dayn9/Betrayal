@@ -8,15 +8,16 @@ public class SceneControl : MonoBehaviour
     private int numTargets;
     private Fade fade;
 
-    [SerializeField] private string nextLevelName;
+    [SerializeField] private string nextLevelName; //level to transition to 
 
     [Header("0 for unlimited")]
-    [SerializeField] private float timeout = 0;
+    [SerializeField] private float timeout = 0; //time to next scene
 
     private void Awake()
     {
         fade = FindObjectOfType<Fade>();
 
+        //If there is a timeout, Start the countdown
         if(timeout > 0)
         {
             StartCoroutine(NextLevel(timeout));
@@ -30,9 +31,9 @@ public class SceneControl : MonoBehaviour
             target.GetComponent<Character>().Attacked.AddListener(() =>
             {
                 numTargets--;
-                Debug.Log(numTargets);
                 if(numTargets <= 0)
                 {
+                    //Go to the next level after 1 second
                     StartCoroutine(NextLevel(1.0f));
                 }
             });
