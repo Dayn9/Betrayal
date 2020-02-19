@@ -64,6 +64,28 @@ public abstract class Character : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Generic Death Procedure plays particle effect and then destoys
+    /// </summary>
+    /// <returns></returns>
+    protected IEnumerator Death()
+    {
+        ParticleSystem particleSystem = GetComponentInChildren<ParticleSystem>();
+        Collider2D collider = GetComponent<Collider2D>();
+
+        renderer.enabled = false;
+        collider.enabled = false;
+
+        if (particleSystem)
+        {
+            particleSystem.Play();
+
+            yield return new WaitForSeconds(particleSystem.main.duration);
+        }
+
+        Destroy(gameObject);
+    }
+
     protected virtual void OnAttacked()
     {
         throw new System.NotImplementedException();

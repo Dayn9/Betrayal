@@ -15,6 +15,8 @@ public class Sheep : Character
     private static readonly float[] IDLE_TIME_RANGE = { 7, 10 };
     private const float FLEE_DIST = 3;
 
+    public float RandomWanderTime { get { return (Random.value * (IDLE_TIME_RANGE[1] - IDLE_TIME_RANGE[0])) + IDLE_TIME_RANGE[0]; } }
+
     private SheepState state;
     public SheepState State
     {
@@ -29,17 +31,16 @@ public class Sheep : Character
             {
                 default:
                 case SheepState.IDLE:
-                    StartCoroutine(Idle( (Random.value * (IDLE_TIME_RANGE[1] - IDLE_TIME_RANGE[0])) + IDLE_TIME_RANGE[0]));
+                    StartCoroutine(Idle(RandomWanderTime));
                     break;
                 case SheepState.WANDER:
-                    StartCoroutine(Wander(Random.insideUnitCircle, 
-                        (Random.value * (WANDER_TIME_RANGE[1] - WANDER_TIME_RANGE[0])) + WANDER_TIME_RANGE[0]));
+                    StartCoroutine(Wander(Random.insideUnitCircle, RandomWanderTime));
                     break;
                 case SheepState.FLEE:
                     StartCoroutine(Flee());
                     break;
                 case SheepState.DEATH:
-                    StartCoroutine(Kill());
+                    StartCoroutine(Death());
                     break;
             }
         }
@@ -108,23 +109,6 @@ public class Sheep : Character
             t += Time.deltaTime;
         }
         State = SheepState.IDLE;
-    }
-
-    private IEnumerator Kill()
-    {
-        ParticleSystem particleSystem = GetComponent<ParticleSystem>();
-        Collider2D collider = GetComponent<Collider2D>();
-
-        renderer.enabled = false;
-        collider.enabled = false;
-
-        particleSystem.Play();
-
-        Debug.Log(particleSystem.main.duration);
-
-        yield return new WaitForSeconds(particleSystem.main.duration);
-
-        Destroy(gameObject);
     }
 
     protected override void OnAttacked() {

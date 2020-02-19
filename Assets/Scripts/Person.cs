@@ -28,13 +28,14 @@ public class Person : Character
                     StartCoroutine(StayInFrame());
                     break;
                 case PersonState.DEATH:
-                    Destroy(gameObject);
+                    StartCoroutine(Death());
                     break;
             }
         }
     }
 
     private const float FLEE_DIST = 5;
+    private const float SAFE_DIST = 7; //should be greater than FLEE_DIST
 
     private void Start()
     {
@@ -67,7 +68,7 @@ public class Person : Character
             animator.SetFloat("Speed", movement.Speed);
 
             diffPlayer = transform.position - Characters.player.transform.position;
-        } while (diffPlayer.sqrMagnitude < FLEE_DIST * FLEE_DIST);
+        } while (diffPlayer.sqrMagnitude < SAFE_DIST * SAFE_DIST);
 
         State = PersonState.IDLE;
     }

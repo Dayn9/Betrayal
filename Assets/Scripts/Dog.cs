@@ -54,7 +54,7 @@ public class Dog : Character
     //TODO don't chase the same sheep twice in a row
 
     private const float CLOSE_DIST = 1.5f;
-    private const float FAR_DIST = 12.0f;
+    private const float FAR_DIST = 8.0f;
     private const float WAIT_TIME = 0.5f;
 
     private void Start()
@@ -199,10 +199,10 @@ public class Dog : Character
             diffPlayer = Characters.player.transform.position - transform.position;
             yield return new WaitForEndOfFrame();
 
-        } while (diffPlayer.sqrMagnitude > CLOSE_DIST * CLOSE_DIST);
+        } while (diffPlayer.sqrMagnitude > FAR_DIST * FAR_DIST);
 
         animator.SetBool("Sad", false);
 
-        State = DogState.IDLE;
+        State = DogState.RETURN;
     }
 }
