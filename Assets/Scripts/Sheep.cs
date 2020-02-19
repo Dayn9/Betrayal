@@ -118,6 +118,10 @@ public class Sheep : Character
         renderer.enabled = false;
         collider.enabled = false;
 
+        particleSystem.Play();
+
+        Debug.Log(particleSystem.main.duration);
+
         yield return new WaitForSeconds(particleSystem.main.duration);
 
         Destroy(gameObject);

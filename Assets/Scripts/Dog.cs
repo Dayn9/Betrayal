@@ -4,7 +4,7 @@ using UnityEngine;
 
 public enum DogState
 {
-    IDLE, CHASE, RETURN
+    IDLE, CHASE, RETURN, PAUSE, SCARE, SAD
 }
 
 public class Dog : Character
@@ -25,16 +25,27 @@ public class Dog : Character
                     StartCoroutine(Idle());
                     break;
                 case DogState.CHASE:
-                    Sheep close = ClosestSheep();
-                    if(close != null)
+                    Sheep closestSheep = ClosestSheep();
+                    if(closestSheep != null)
                     {
-                        StartCoroutine(Chase(close)); //start chasing the closest sheep
+                        //there is a sheep: chase it
+                        StartCoroutine(Chase(closestSheep)); 
                         break;
                     }
+                    //there are no sheep: return to player
                     State = DogState.RETURN;  
                     break;
                 case DogState.RETURN:
                     StartCoroutine(Return());
+                    break;
+                case DogState.PAUSE:
+                    StartCoroutine(Pause());
+                    break;
+                case DogState.SAD:
+                    StartCoroutine(Sad());
+                    break;
+                case DogState.SCARE:
+                    animator.SetTrigger("Scare");
                     break;
             }
         }
@@ -43,22 +54,24 @@ public class Dog : Character
     //TODO don't chase the same sheep twice in a row
 
     private const float CLOSE_DIST = 1.5f;
-    private const float WAIT_TIME = 2.0f;
+    private const float FAR_DIST = 12.0f;
+    private const float WAIT_TIME = 0.5f;
 
     private void Start()
     {
-        State = DogState.IDLE;
+        State = DogState.CHASE;
     }
 
-    //TODO: param for Idle: time
+    //TODO: param  or Idle: time
     //after set time, dog chases
     //if out of range, dog returns
 
+    /// <summary>
+    /// Wag tail by the player until they leave
+    /// </summary>
+    /// <returns></returns>
     private IEnumerator Idle()
     {
-        animator.SetFloat("Speed", 0);
-        movement.Input = Vector2.zero;
-
         Vector2 diffPlayer;
         do
         {
@@ -67,17 +80,20 @@ public class Dog : Character
 
         } while (diffPlayer.sqrMagnitude < CLOSE_DIST * CLOSE_DIST);
 
-        yield return new WaitForSeconds(WAIT_TIME);
-
-        State = DogState.CHASE;        
+        State = DogState.PAUSE;
     }
 
+    /// <summary>
+    /// Chase a sheep until close
+    /// </summary>
+    /// <param name="sheep">Sheep to chase</param>
+    /// <returns></returns>
     private IEnumerator Chase(Sheep sheep)
     {
         Vector2 diffSheep;
         do
         {
-            //Pursue the player
+            //Pursue the Sheep
             movement.Input = Vector2.zero;
             movement.Seek(sheep.movement);
 
@@ -88,10 +104,28 @@ public class Dog : Character
 
         } while (diffSheep.sqrMagnitude > CLOSE_DIST * CLOSE_DIST);
 
-        State = DogState.RETURN;
+        //Stop moving
+        movement.Input = Vector2.zero;
+        animator.SetFloat("Speed", 0);
 
+        //Check player distance
+        Vector2 diffPlayer = Characters.player.transform.position - transform.position;
+        if (diffPlayer.sqrMagnitude > FAR_DIST * FAR_DIST)
+        {
+            //player is far away
+            State = DogState.SAD;
+        }
+        else
+        {
+            //player is close
+            State = DogState.RETURN;
+        }
     }
 
+    /// <summary>
+    /// Find the closest Sheep
+    /// </summary>
+    /// <returns>The Closest Sheep</returns>
     private Sheep ClosestSheep()
     {
         if(Characters.sheep.Count > 0)
@@ -111,6 +145,10 @@ public class Dog : Character
         return null;
     }
 
+    /// <summary>
+    /// Chase the player until close
+    /// </summary>
+    /// <returns></returns>
     private IEnumerator Return()
     {
         Vector2 diffPlayer;
@@ -127,6 +165,44 @@ public class Dog : Character
 
         } while (diffPlayer.sqrMagnitude > CLOSE_DIST * CLOSE_DIST);
 
+        movement.Input = Vector2.zero;
+        animator.SetFloat("Speed", 0);
+
         State = DogState.IDLE;        
+    }
+
+    /// <summary>
+    /// Wait for a few seconds and then chase
+    /// </summary>
+    /// <returns></returns>
+    private IEnumerator Pause()
+    {
+        animator.SetBool("Pause", true);
+
+        yield return new WaitForSeconds(WAIT_TIME);
+
+        animator.SetBool("Pause", false);
+
+        State = DogState.CHASE;
+    }
+
+    /// <summary>
+    /// Wait for the palyer to get close
+    /// </summary>
+    /// <returns></returns>
+    private IEnumerator Sad(){
+        animator.SetBool("Sad", true);
+
+        Vector2 diffPlayer;
+        do
+        {
+            diffPlayer = Characters.player.transform.position - transform.position;
+            yield return new WaitForEndOfFrame();
+
+        } while (diffPlayer.sqrMagnitude > CLOSE_DIST * CLOSE_DIST);
+
+        animator.SetBool("Sad", false);
+
+        State = DogState.IDLE;
     }
 }
