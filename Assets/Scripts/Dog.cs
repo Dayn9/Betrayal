@@ -10,7 +10,8 @@ public enum DogState
 public class Dog : Character
 {
     private DogState state;
-    public DogState State {
+    public DogState State
+    {
         get { return state; }
         private set
         {
@@ -22,18 +23,36 @@ public class Dog : Character
             {
                 default:
                 case DogState.IDLE:
-                    StartCoroutine(Idle());
-                    break;
-                case DogState.CHASE:
-                    Sheep closestSheep = ClosestSheep();
-                    if(closestSheep != null)
+                    //stand next to the closest person if close
+                    Person closesetPerson = Closest<Person>();
+                    if (closesetPerson != null &&
+                        (closesetPerson.transform.position - transform.position).sqrMagnitude < CLOSE_DIST * CLOSE_DIST)
                     {
-                        //there is a sheep: chase it
-                        StartCoroutine(Chase(closestSheep)); 
+                        StartCoroutine(Idle(closesetPerson));
                         break;
                     }
-                    //there are no sheep: return to player
-                    State = DogState.RETURN;  
+                    //stand next the player
+                    StartCoroutine(Idle(Characters.player));
+
+                    break;
+                case DogState.CHASE:
+                    //chase the closest sheep
+                    Sheep closestSheep = Closest<Sheep>();
+                    if (closestSheep != null)
+                    {
+                        //there is a sheep: chase it
+                        StartCoroutine(Chase(closestSheep));
+                        break;
+                    }
+                    //chase the closest person
+                    closesetPerson = Closest<Person>();
+                    if (closesetPerson != null)
+                    {
+                        StartCoroutine(Chase(closesetPerson));
+                        break;
+                    }
+                    //there are no sheep or people: return to player
+                    State = DogState.RETURN;
                     break;
                 case DogState.RETURN:
                     StartCoroutine(Return());
@@ -51,9 +70,7 @@ public class Dog : Character
         }
     }
 
-    //TODO don't chase the same sheep twice in a row
-
-    private const float CLOSE_DIST = 1.5f;
+    public const float CLOSE_DIST = 1.5f;
     private const float FAR_DIST = 8.0f;
     private const float WAIT_TIME = 0.5f;
 
@@ -62,23 +79,19 @@ public class Dog : Character
         State = DogState.CHASE;
     }
 
-    //TODO: param  or Idle: time
-    //after set time, dog chases
-    //if out of range, dog returns
-
     /// <summary>
-    /// Wag tail by the player until they leave
+    /// Wag tail by the player or person until they leave
     /// </summary>
     /// <returns></returns>
-    private IEnumerator Idle()
+    private IEnumerator Idle(Character character)
     {
-        Vector2 diffPlayer;
+        Vector2 diffClose;
         do
         {
-            diffPlayer = Characters.player.transform.position - transform.position;
+            diffClose = character.transform.position - transform.position;
             yield return new WaitForEndOfFrame();
 
-        } while (diffPlayer.sqrMagnitude < CLOSE_DIST * CLOSE_DIST);
+        } while (character != null && diffClose.sqrMagnitude < CLOSE_DIST * CLOSE_DIST);
 
         State = DogState.PAUSE;
     }
@@ -86,63 +99,48 @@ public class Dog : Character
     /// <summary>
     /// Chase a sheep until close
     /// </summary>
-    /// <param name="sheep">Sheep to chase</param>
+    /// <param name="character">character to chase</param>
     /// <returns></returns>
-    private IEnumerator Chase(Sheep sheep)
+    private IEnumerator Chase(Character character)
     {
-        Vector2 diffSheep;
+        Vector2 diffCharacter;
         do
         {
-            //Pursue the Sheep
+            //Pursue the character
             movement.Input = Vector2.zero;
-            movement.Seek(sheep.movement);
+            movement.Seek(character.movement);
 
             animator.SetFloat("Speed", movement.Speed);
 
-            diffSheep = sheep.transform.position - transform.position;
+            diffCharacter = character.transform.position - transform.position;
             yield return new WaitForEndOfFrame();
 
-        } while (diffSheep.sqrMagnitude > CLOSE_DIST * CLOSE_DIST);
+        } while (character != null && diffCharacter.sqrMagnitude > CLOSE_DIST * CLOSE_DIST);
 
         //Stop moving
         movement.Input = Vector2.zero;
         animator.SetFloat("Speed", 0);
 
-        //Check player distance
-        Vector2 diffPlayer = Characters.player.transform.position - transform.position;
-        if (diffPlayer.sqrMagnitude > FAR_DIST * FAR_DIST)
+        //Check if chasing a Person
+        if(character != null && character is Person) //Are you is person?
         {
-            //player is far away
-            State = DogState.SAD;
+            State = DogState.IDLE;
         }
         else
         {
-            //player is close
-            State = DogState.RETURN;
-        }
-    }
-
-    /// <summary>
-    /// Find the closest Sheep
-    /// </summary>
-    /// <returns>The Closest Sheep</returns>
-    private Sheep ClosestSheep()
-    {
-        if(Characters.sheep.Count > 0)
-        {
-            float closestDist = float.MaxValue;
-            Sheep closest = null;
-
-            foreach(Sheep sheep in Characters.sheep)
+            //Check player distance
+            Vector2 diffPlayer = Characters.player.transform.position - transform.position;
+            if (diffPlayer.sqrMagnitude > FAR_DIST * FAR_DIST)
             {
-                Vector2 diffSheep = sheep.transform.position - transform.position;
-                if (diffSheep.sqrMagnitude < closestDist)
-                    closest = sheep;
+                //player is far away
+                State = DogState.SAD;
             }
-
-            return closest;
+            else
+            {
+                //player is close
+                State = DogState.RETURN;
+            }
         }
-        return null;
     }
 
     /// <summary>

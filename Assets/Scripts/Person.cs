@@ -42,17 +42,27 @@ public class Person : Character
         State = PersonState.IDLE;
     }
 
+    /// <summary>
+    /// Idle while player is far away or dog is close
+    /// </summary>
+    /// <returns></returns>
     private IEnumerator Idle()
     {
         movement.Input = Vector2.zero;
         animator.SetFloat("Speed", 0);
         Vector2 diffPlayer;
+        Vector2 diffDog = Vector2.zero;
         do
         {
             yield return new WaitForEndOfFrame();
+            
             diffPlayer = transform.position - Characters.player.transform.position;
+            
+            if(Characters.dog != null)
+                diffDog = transform.position - Characters.dog.transform.position;
 
-        } while (diffPlayer.sqrMagnitude > FLEE_DIST * FLEE_DIST);
+        } while (diffPlayer.sqrMagnitude > FLEE_DIST * FLEE_DIST || 
+                 (Characters.dog != null && diffDog.sqrMagnitude < Dog.CLOSE_DIST * Dog.CLOSE_DIST));
 
         State = PersonState.FLEE;
     }
