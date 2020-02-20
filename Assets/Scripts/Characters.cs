@@ -117,6 +117,10 @@ public abstract class Character : MonoBehaviour
         {
             characters = Characters.people as List<T>;
         }
+        else if (typeof(T).Equals(typeof(Chicken)))
+        {
+            characters = Characters.chicken as List<T>;
+        }
         else if (typeof(T).Equals(typeof(Dog)))
         {
             return Characters.dog as T;
@@ -127,7 +131,7 @@ public abstract class Character : MonoBehaviour
         }
 
         //make sure the list has elements
-        if (characters.Count > 0)
+        if (characters.Count > 0 )
         {
             float closestDist = float.MaxValue;
             T closest = null;
@@ -135,6 +139,8 @@ public abstract class Character : MonoBehaviour
             //loop over list
             foreach (T character in characters)
             {
+                if (character.Equals(this)) continue; //skip self
+
                 //get the difference and set if closer
                 Vector2 diffSheep = character.transform.position - transform.position;
                 if (diffSheep.sqrMagnitude < closestDist)

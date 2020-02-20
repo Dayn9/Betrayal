@@ -4,7 +4,7 @@ using UnityEngine;
 
 public enum ChickenState
 {
-    IDLE, FLEE, DEATH
+    IDLE, FLOCK, FLEE, DEATH
 }
 
 public class Chicken : Character
@@ -24,6 +24,10 @@ public class Chicken : Character
                 case ChickenState.IDLE:
                     StartCoroutine(Idle());
                     break;
+                case ChickenState.FLOCK:
+                    StartCoroutine(Flock());
+                    StartCoroutine(StayInFrame());
+                    break;
                 case ChickenState.FLEE:
                     StartCoroutine(Flee());
                     StartCoroutine(StayInFrame());
@@ -35,12 +39,13 @@ public class Chicken : Character
         }
     }
 
+    private const float CLOSE_DIST = 1.2f;
     private const float FLEE_DIST = 3;
     private const float SAFE_DIST = 5; //should be greater than FLEE_DIST
 
     private void Start()
     {
-        State = ChickenState.IDLE;
+        State = ChickenState.FLOCK;
     }
 
     private IEnumerator Idle()
@@ -51,11 +56,67 @@ public class Chicken : Character
         {
             yield return new WaitForEndOfFrame();
 
+            Chicken closestChicken = Closest<Chicken>();
+            Vector2 diffChicken;
+            if (closestChicken)
+            {
+                diffChicken = transform.position - closestChicken.transform.position;
+                if(diffChicken.sqrMagnitude > CLOSE_DIST * CLOSE_DIST)
+                {
+                    State = ChickenState.FLOCK;
+                }
+            }
+
+            diffPlayer = transform.position - Characters.player.transform.position;
+            diffDog = transform.position - Characters.dog.transform.position;
+
+
+        } while (diffPlayer.sqrMagnitude > FLEE_DIST * FLEE_DIST &&
+                 diffDog.sqrMagnitude > FLEE_DIST * FLEE_DIST);
+
+        State = ChickenState.FLEE;
+    }
+
+    private IEnumerator Flock()
+    {
+        Vector2 diffPlayer;
+        Vector2 diffDog;
+        do
+        {
+            yield return new WaitForEndOfFrame();
+
+            movement.Input = Vector2.zero;
+            animator.SetFloat("Speed", movement.Speed);
+
+            Vector2 diffChicken;
+            foreach(Chicken chicken in Characters.chicken)
+            {
+                if (chicken.Equals(this)) continue; //skip self 
+
+                diffChicken = transform.position - chicken.transform.position;
+                if(diffChicken.sqrMagnitude < CLOSE_DIST * CLOSE_DIST)
+                {
+                    movement.Input = Vector2.zero;
+                    animator.SetFloat("Speed", 0);
+
+                    State = ChickenState.IDLE;
+                    break;
+                }
+                if (diffChicken.sqrMagnitude < FLEE_DIST * FLEE_DIST)
+                {
+                    continue;
+                }
+                movement.Seek(chicken.movement);
+            }
+
             diffPlayer = transform.position - Characters.player.transform.position;
             diffDog = transform.position - Characters.dog.transform.position;
 
         } while (diffPlayer.sqrMagnitude > FLEE_DIST * FLEE_DIST &&
                  diffDog.sqrMagnitude > FLEE_DIST * FLEE_DIST);
+
+        movement.Input = Vector2.zero;
+        animator.SetFloat("Speed", 0);
 
         State = ChickenState.FLEE;
     }
@@ -82,7 +143,7 @@ public class Chicken : Character
         movement.Input = Vector2.zero;
         animator.SetFloat("Speed", 0);
 
-        State = ChickenState.IDLE;
+        State = ChickenState.FLOCK;
     }
 
     protected override void OnAttacked()
