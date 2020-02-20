@@ -9,6 +9,7 @@ public class Characters : MonoBehaviour
     public static Dog dog { get; set; }
     public static List<Sheep> sheep { get; set; }
     public static List<Person> people { get; set; }
+    public static List<Chicken> chicken { get; set; }
 
     private void Awake()
     {
@@ -21,6 +22,9 @@ public class Characters : MonoBehaviour
 
         people = new List<Person>();
         people.AddRange(FindObjectsOfType<Person>());
+
+        chicken = new List<Chicken>();
+        chicken.AddRange(FindObjectsOfType<Chicken>());
     }
 }
 

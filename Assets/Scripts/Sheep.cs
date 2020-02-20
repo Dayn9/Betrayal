@@ -9,8 +9,6 @@ public enum SheepState
 
 public class Sheep : Character
 {
-    private Vector2 wanderDirection = Vector2.zero;
-
     private static readonly float[] WANDER_TIME_RANGE = { 1, 2 };
     private static readonly float[] IDLE_TIME_RANGE = { 7, 10 };
     private const float FLEE_DIST = 3;
@@ -53,12 +51,11 @@ public class Sheep : Character
 
     private IEnumerator Idle(float time)
     {
-        movement.Input = Vector2.zero;
-        animator.SetFloat("Speed", 0);
         float t = 0;
         while(t < time)
         {
-            if(Characters.dog != null)
+            //flee from the dog
+            if(Characters.dog)
             {
                 Vector2 diffDog = transform.position - Characters.dog.transform.position;
                 if(diffDog.sqrMagnitude < FLEE_DIST * FLEE_DIST)
@@ -86,6 +83,9 @@ public class Sheep : Character
             diffDog = transform.position - Characters.dog.transform.position;
         } while (diffDog.sqrMagnitude < FLEE_DIST * FLEE_DIST);
 
+        movement.Input = Vector2.zero;
+        animator.SetFloat("Speed", 0);
+
         State = SheepState.IDLE;
     }
 
@@ -108,6 +108,10 @@ public class Sheep : Character
             yield return new WaitForEndOfFrame();
             t += Time.deltaTime;
         }
+
+        movement.Input = Vector2.zero;
+        animator.SetFloat("Speed", 0);
+
         State = SheepState.IDLE;
     }
 
