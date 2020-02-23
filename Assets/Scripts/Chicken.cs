@@ -56,6 +56,8 @@ public class Chicken : Character
         {
             yield return new WaitForEndOfFrame();
 
+            animator.SetFloat("Speed", 0);
+
             Chicken closestChicken = Closest<Chicken>();
             Vector2 diffChicken;
             if (closestChicken)

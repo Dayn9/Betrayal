@@ -64,7 +64,8 @@ public class Dog : Character
                     StartCoroutine(Sad());
                     break;
                 case DogState.SCARE:
-                    animator.SetTrigger("Scare");
+                    animator.SetTrigger("Scare"); //Animation will return to IDLE
+                    movement.Input = Vector2.zero;
                     break;
             }
         }
@@ -202,5 +203,11 @@ public class Dog : Character
         animator.SetBool("Sad", false);
 
         State = DogState.RETURN;
+    }
+
+    protected override void OnAttacked()
+    {
+        Debug.Log("HURT DOG");
+        State = DogState.SCARE;
     }
 }

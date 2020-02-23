@@ -56,19 +56,18 @@ public class Player : Character
         }
     }
   
-
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (state != PlayerState.SWIPE && collision.gameObject.CompareTag("Target"))
+        Character character = collision.gameObject.GetComponent<Character>();
+        //check if not already swiping and (Target or Crow)
+        if (state != PlayerState.SWIPE && character != null &&
+            (collision.gameObject.CompareTag("Target") || character is Crow))
         {
             State = PlayerState.SWIPE;
 
-            Character character = collision.gameObject.GetComponent<Character>();
-            if (character != null)
-            {
-                //Run the Attack behavior on the target character
-                character.Attacked?.Invoke();
-            }
+            //Run the Attack behavior on the target character
+            character.Attacked?.Invoke();
+
         }
     }
 }

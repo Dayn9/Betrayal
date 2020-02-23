@@ -10,6 +10,7 @@ public class Characters : MonoBehaviour
     public static List<Sheep> sheep { get; set; }
     public static List<Person> people { get; set; }
     public static List<Chicken> chicken { get; set; }
+    public static List<Crow> crows { get; set; }
 
     private void Awake()
     {
@@ -25,6 +26,9 @@ public class Characters : MonoBehaviour
 
         chicken = new List<Chicken>();
         chicken.AddRange(FindObjectsOfType<Chicken>());
+
+        crows = new List<Crow>();
+        crows.AddRange(FindObjectsOfType<Crow>());
     }
 }
 
@@ -120,6 +124,10 @@ public abstract class Character : MonoBehaviour
         else if (typeof(T).Equals(typeof(Chicken)))
         {
             characters = Characters.chicken as List<T>;
+        }
+        else if(typeof(T).Equals(typeof(Crow)))
+        {
+            characters = Characters.crows as List<T>;
         }
         else if (typeof(T).Equals(typeof(Dog)))
         {
