@@ -122,6 +122,8 @@ public class Crow : Character
         //knock back
         transform.position += (transform.position - Characters.player.transform.position).normalized * 0.5f;
 
+        animator.SetTrigger("Hurt");
+
         State = CrowState.FLEE;
     }
 }
