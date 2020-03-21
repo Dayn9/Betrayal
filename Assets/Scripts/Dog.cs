@@ -4,11 +4,13 @@ using UnityEngine;
 
 public enum DogState
 {
-    IDLE, CHASE, RETURN, PAUSE, SCARE, SAD
+    IDLE, CHASE, RETURN, PAUSE, SCARE, SAD, DEATH
 }
 
 public class Dog : Character
 {
+    [SerializeField] private bool FINAL;
+
     private DogState state;
     public DogState State
     {
@@ -67,6 +69,9 @@ public class Dog : Character
                     animator.SetTrigger("Scare"); //Animation will return to IDLE
                     movement.Input = Vector2.zero;
                     break;
+                case DogState.DEATH:
+                    StartCoroutine(Death());
+                    break;
             }
         }
     }
@@ -77,7 +82,14 @@ public class Dog : Character
 
     private void Start()
     {
-        State = DogState.CHASE;
+        if (FINAL)
+        {
+            State = DogState.SAD;
+        }
+        else
+        {
+            State = DogState.CHASE;
+        }
     }
 
     /// <summary>
@@ -198,7 +210,7 @@ public class Dog : Character
             diffPlayer = Characters.player.transform.position - transform.position;
             yield return new WaitForEndOfFrame();
 
-        } while (diffPlayer.sqrMagnitude > FAR_DIST * FAR_DIST);
+        } while (diffPlayer.sqrMagnitude > FAR_DIST * FAR_DIST || FINAL);
 
         animator.SetBool("Sad", false);
 
@@ -207,6 +219,14 @@ public class Dog : Character
 
     protected override void OnAttacked()
     {
-        State = DogState.SCARE;
+        if (FINAL)
+        {
+            Characters.dog = null;
+            State = DogState.DEATH;
+        }
+        else
+        {
+            State = DogState.SCARE;
+        }
     }
 }

@@ -370,6 +370,11 @@ PrefabInstance:
       propertyPath: timeout
       value: 5
       objectReference: {fileID: 0}
+    - target: {fileID: 8223092679016332602, guid: c6bfcb5ff2f39b3439b2d881d4c4fa88,
+        type: 3}
+      propertyPath: dialogue
+      value: Crows are assholes
+      objectReference: {fileID: 0}
     - target: {fileID: 8378463815277850141, guid: c6bfcb5ff2f39b3439b2d881d4c4fa88,
         type: 3}
       propertyPath: m_LocalPosition.x
