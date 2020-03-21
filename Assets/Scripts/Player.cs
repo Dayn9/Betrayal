@@ -58,6 +58,7 @@ public class Player : Character
   
     private void OnCollisionEnter2D(Collision2D collision)
     {
+
         Character character = collision.gameObject.GetComponent<Character>();
         //check if not already swiping and (Target or Crow)
         if (state != PlayerState.SWIPE && character != null &&

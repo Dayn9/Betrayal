@@ -207,7 +207,6 @@ public class Dog : Character
 
     protected override void OnAttacked()
     {
-        Debug.Log("HURT DOG");
         State = DogState.SCARE;
     }
 }

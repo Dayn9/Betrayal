@@ -42,6 +42,31 @@ public abstract class Character : MonoBehaviour
 
     public UnityEvent Attacked;
 
+    /// <summary>
+    /// Camera frame
+    /// </summary>
+    private static Rect frame;
+    protected static Rect Frame
+    {
+        get
+        {
+            //check if the frame has been set yet
+            if (frame.width == 0)
+            {
+                //calculate the frame from camera size
+                float height = Camera.main.orthographicSize;
+                float width = height * Camera.main.aspect;
+                Vector2 extents = new Vector2(width, height);
+
+                frame = new Rect(
+                    position: (Vector2)Camera.main.transform.position - extents,
+                    size: extents * 2
+                );
+            }
+            return frame;
+        }
+    }
+
     private void Awake()
     {
         movement = GetComponent<Movement>();
@@ -57,18 +82,9 @@ public abstract class Character : MonoBehaviour
     /// <returns></returns>
     protected IEnumerator StayInFrame()
     {
-        float height = Camera.main.orthographicSize;
-        float width = height * Camera.main.aspect;
-        Vector2 extents = new Vector2(width, height);
-
-        Rect frame = new Rect(
-            position: (Vector2)Camera.main.transform.position - extents, 
-            size: extents * 2
-        );
-
         while (true)
         {
-            movement.StayInside(frame, 2);
+            movement.StayInside(Frame, 2);
 
             yield return new WaitForEndOfFrame();
         }
@@ -139,7 +155,7 @@ public abstract class Character : MonoBehaviour
         }
 
         //make sure the list has elements
-        if (characters.Count > 0 )
+        if (characters != null && characters.Count > 0 )
         {
             float closestDist = float.MaxValue;
             T closest = null;

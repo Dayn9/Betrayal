@@ -124,6 +124,12 @@ public class Crow : Character
 
         animator.SetTrigger("Hurt");
 
+        if (!Frame.Contains(transform.position))
+        {
+            Characters.crows.Remove(this);
+            Destroy(gameObject);
+        }
+
         State = CrowState.FLEE;
     }
 }
